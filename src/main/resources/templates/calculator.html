@@ -3,147 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <title>calculator</title>
+<script src="/js/calculator.js" ></script>
+<style type="text/css">
+	.operator{
+		width: 73px;
+		height: 30px;
+	}
+	.number{
+		width: 100px;
+		height: 30px;
+	}
+</style>
 </head>
 <body>
-	<input id="inputNum" name="inputNum" style="width: 300px; height: 30px;">
+	<input id="inputNum" name="inputNum" value="0" style="width: 300px; height: 30px;">
 	<br>
-	<button onclick="setCalculation('+')" style="width:73px; height: 30px;">+</button>
-	<button onclick="setCalculation('-')" style="width:73px; height: 30px;">-</button>
-	<button onclick="setCalculation('*')" style="width:73px; height: 30px;">*</button>
-	<button onclick="setCalculation('/')" style="width:73px; height: 30px;">/</button>
+	<button class="operator" onclick="setCalculation('+')">+</button>
+	<button class="operator" onclick="setCalculation('-')">-</button>
+	<button class="operator" onclick="setCalculation('*')">*</button>
+	<button class="operator" onclick="setCalculation('/')">/</button>
 	<br>
-	<button onclick="setCalculation(7)" style="width:100px; height: 30px;">7</button>
-	<button onclick="setCalculation(8)" style="width:100px; height: 30px;">8</button>
-	<button onclick="setCalculation(9)" style="width:100px; height: 30px;">9</button>
+	<button class="number" onclick="setCalculation('7')">7</button>
+	<button class="number" onclick="setCalculation('8')">8</button>
+	<button class="number" onclick="setCalculation('9')">9</button>
 	<br>
-	<button onclick="setCalculation(4)" style="width:100px; height: 30px;">4</button>
-	<button onclick="setCalculation(5)" style="width:100px; height: 30px;">5</button>
-	<button onclick="setCalculation(6)" style="width:100px; height: 30px;">6</button>
+	<button class="number" onclick="setCalculation('4')">4</button>
+	<button class="number" onclick="setCalculation('5')">5</button>
+	<button class="number" onclick="setCalculation('6')">6</button>
 	<br>
-	<button onclick="setCalculation(1)" style="width:100px; height: 30px;">1</button>
-	<button onclick="setCalculation(2)" style="width:100px; height: 30px;">2</button>
-	<button onclick="setCalculation(3)" style="width:100px; height: 30px;">3</button>
+	<button class="number" onclick="setCalculation('1')">1</button>
+	<button class="number" onclick="setCalculation('2')">2</button>
+	<button class="number" onclick="setCalculation('3')">3</button>
 	<br>
-	<button onclick="setCalculation('C')" style="width:100px; height: 30px;">C</button>
-	<button onclick="setCalculation(0)" style="width:100px; height: 30px;">0</button>
-	<button onclick="calculate()" style="width:100px; height: 30px;">=</button>
+	<button class="number" onclick="setCalculation('C')">C</button>
+	<button class="number" onclick="setCalculation('0')">0</button>
+	<button class="number" onclick="calculate()">=</button>
 </body>
-<script type="text/javascript">
-	const operator = ['+','-','*','/'];
-	
-	function setCalculation(text){
-		let calculation = document.querySelector('#inputNum').value;
-		
-		if(calculation == ""){ 
-			if(operator.includes(text)){	//빈 계산식에 연산자를 입력할 경우
-				calculation = "0" + text;
-			}
-			else {
-				calculation += text;
-			}
-		} else{ 
-			if(calculation == "0" && text == "0"){
-				calculation = "0"; //계산식이 0인 상태에서 0을 계속 입력할 경우
-			} 
-			else if(calculation == "0" && text != "0" && !operator.includes(text)){
-				calculation = text; //계산식이 0이면서 일반 숫자를 입력한 경우 0을 삭제하고 숫자를 출력
-			}
-			else {
-				//계산식이 존재할 경우
-				let last = calculation.slice(-1); 
-				let preLast = calculation.slice(-2, -1);
-				
-				if(operator.includes(last) && operator.includes(text)){ //가장 마지막에 입력한 문자와 새로 입력한 문자가 연산자인지 체크
-					calculation = calculation.slice(0, calculation.length-1); //연산자를 다시 입력했을 경우 이전 연산자를 제거하고 새로운 연산자로 대체
-				}
-				
-				if(last == 0 && operator.includes(preLast)){   //마지막에 입력한 값이 숫자 0이면서 이전 값이 연산자인 경우 ex) 25 + 0
-					calculation = calculation.slice(0, calculation.length-1);
-				}
-				calculation += text; //기존 계산식에 새로운 문자 더함
-			}
-		}
-		
-		if(text == 'C'){
-			calculation = ""; //계산식 초기화
-		}
-		document.querySelector('#inputNum').value = calculation; 
-	}
-	
-	function calculate(){ //후위계산
-		let calculation = document.querySelector('#inputNum').value;
-		
-		if(calculation == ""){
-			document.querySelector('#inputNum').value = 0; // 계산식이 비어있는데 =을 입력했을 경우 0 출력
-		}
-		else {
-			let chk = calculation.slice(-1); 
-			
-			if(operator.includes(chk))
-				calculation = calculation.slice(0, calculation.length-1); //마지막에 입력한 값이 연산자일 경우 해당 연산자를 제외하고 계산
-				
-			let arr = calculation.split('');	
-			let numArr = new Array(); //숫자 배열
-			let opArr = new Array(); //연산자 배열
-			
-			let tmp = "";
-			for(let i=0; i<arr.length; i++){
-				let a = arr[i];
-				if(!operator.includes(a)){  //피연산자일 경우 문자열 합침
-					tmp += a;
-				} 
-				else{
-					numArr.push(Number(tmp)); //연산자일 경우 합친 문자열을 숫자 배열로 집어넣고
-					tmp = "";
-					opArr.push(a); //연산자도 순서대로 넣는다
-				}
-			}
-			if (tmp != "")
-				numArr.push(Number(tmp)); //마지막 숫자 push
-			
-			let size = opArr.length;
-			let result = 0;
-			let tmpArr = new Array();
-			
-			for(let i=0; i<size; i++){ //연산자 배열의 크기만큼
-				let oper = opArr[i];
-				
-				if(oper == '*' || oper == '/'){ //곱셈 , 나눗셈 연산을 우선적으로 수행
-					tmpArr.push(i);
-					let operand1 = numArr[i];
-					let operand2 = numArr[i+1];
-					
-					if(oper == '*')
-						result = operand1 * operand2;
-					else if(oper == '/')
-						result = operand1 / operand2; //연산
-					
-					numArr[i+1] = result; //새롭게 계산한 값은 계산한 위치에 넣어두고
-				}
-			}
-			
-			var tmpSize = tmpArr.length;
-			
-			for(let i=0; i<tmpSize; i++){
-				let idx = tmpArr.pop(); //수정된 배열 길이의 영향을 받지 않도록 뒷 index부터 가져옴
-				numArr.splice(idx, 1); //사용한 피연산자 삭제 
-				opArr.splice(idx, 1); //사용한 연산자 삭제
-			}
-			
-			size = opArr.length; //곱셈, 나눗셈을 제외한 연산자 배열의 길이만큼
-			
-			for(let i=0; i<size; i++){
-				let oper = opArr[i];
-				let operand1 = numArr[i];
-				let operand2 = numArr[i+1];
-				if(oper == '+')
-					result = operand1 + operand2;
-				else if(oper == '-')
-					result = operand1 - operand2;
-				numArr[i+1] = result;
-			}
-			document.querySelector('#inputNum').value = numArr.pop(); //가장 마지막 값을 결과값으로 출력
-		}
-	}
-</script>
 </html>
