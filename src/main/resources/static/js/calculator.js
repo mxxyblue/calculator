@@ -7,7 +7,7 @@ function setCalculation(text) {
 	displayValue = inputNotEmptyProcess(displayValue, text); //계산식 처리
 
 	if (text === 'C') {
-		displayValue = ""; //계산식 초기화
+		displayValue = "0"; //계산식 초기화
 	}
 
 	document.querySelector('#inputNum').value = displayValue;
@@ -63,57 +63,51 @@ function inputNotEmptyCalculate(displayValue) { //계산식이 비어있지 않�
 	if (OPERATOR.includes(chk)){
 		displayValue = displayValue.slice(0, displayValue.length - 1); //마지막에 입력한 값이 연산자일 경우 해당 연산자를 제외하고 계산
 	}
+	const params = {
+		numberList: [],
+		operatorList: [],
+		garbageList: [],
+		result: 0
+	} //연산식을 처리할 Object 선언
 	
-	let splitDisplayVal = splitDisplayValue(displayValue); //연산식 배열 처리
-	let numArr = splitDisplayVal[0]; //숫자 배열
-	let opArr = splitDisplayVal[1]; //연산자 배열
-
-	let calResult = calculateMultiplyAndDivide(numArr, opArr); //곱하기, 나누기 연산
-	numArr = calResult[0];
-	opArr = calResult[1];
-	let tmpArr = calResult[2];
-	
-	calResult = deleteUsedCalculation(numArr, opArr, tmpArr); //사용한 계산식 삭제
-	numArr = calResult[0];
-	opArr = calResult[1];
-	
-	numArr = calculatePlusAndMinus(numArr, opArr); //더하기, 빼기 연산
-	return numArr.pop(); //가장 마지막 값을 결과값으로 출력
+	splitDisplayValue(displayValue, params); //연산식 배열 처리
+	calculateMultiplyAndDivide(params); //곱하기, 나누기 연산
+	deleteUsedCalculation(params); //사용한 계산식 삭제
+	calculatePlusAndMinus(params); //더하기, 빼기 연산
+	return params.result; //가장 마지막 값을 결과값으로 출력
 }
 
-function splitDisplayValue(displayValue){ //계산식 배열 처리
+function splitDisplayValue(displayValue, params){ //계산식 배열 처리
 	let arr = displayValue.split('');
-		let numArr = []; //숫자 배열
-		let opArr = []; //연산자 배열
-		let tmp = "";
-		
-		for (let i = 0; i < arr.length; i++) {
-			let a = arr[i];
-			if (!OPERATOR.includes(a)) {  //피연산자일 경우 문자열 합침
-				tmp += a;
-			}
-			else {
-				numArr.push(Number(tmp)); //연산자일 경우 합친 문자열을 숫자 배열로 집어넣고
-				tmp = "";
-				opArr.push(a); //연산자도 순서대로 넣는다
-			}
+	let tmp = "";
+	for (let i = 0; i < arr.length; i++) {
+		let a = arr[i];
+		if (!OPERATOR.includes(a)) {  //피연산자일 경우 문자열 합침
+			tmp += a;
 		}
-		if (tmp != ""){
-			numArr.push(Number(tmp)); //마지막 숫자 push
+		else {
+			params.numberList.push(Number(tmp)); //연산자일 경우 합친 문자열을 숫자 배열로 집어넣고
+			tmp = "";
+			params.operatorList.push(a); //연산자도 순서대로 넣는다
 		}
-	return [numArr, opArr];
+	}
+	if (tmp != ""){
+		params.numberList.push(Number(tmp)); //마지막 숫자 push
+	}
 }
 
-function calculateMultiplyAndDivide(numArr, opArr){
-	let tmpArr = [];
+function calculateMultiplyAndDivide(params){
 	let result = 0;
+	let garArr = params.garbageList;
+	let numArr = params.numberList;
+	let opArr = params.operatorList;
 	let size = opArr.length;
 	
 	for (let i = 0; i < size; i++) { //연산자 배열의 크기만큼
 		let oper = opArr[i];
 
 		if (oper === '*' || oper === '/') { //곱셈 , 나눗셈 연산을 우선적으로 수행
-			tmpArr.push(i);
+			garArr.push(i);
 			let operand1 = numArr[i];
 			let operand2 = numArr[i + 1];
 
@@ -125,21 +119,24 @@ function calculateMultiplyAndDivide(numArr, opArr){
 			numArr[i + 1] = result; //새롭게 계산한 값은 계산한 위치에 넣어두고
 		}
 	}
-	return [numArr, opArr, tmpArr];
 }
 
-function deleteUsedCalculation(numArr, opArr, tmpArr){
-	let tmpSize = tmpArr.length;
+function deleteUsedCalculation(params){
+	let garArr = params.garbageList;
+	let numArr = params.numberList;
+	let opArr = params.operatorList;
+	let size = params.garbageList.length;
 
-	for (let i = 0; i < tmpSize; i++) {
-		let idx = tmpArr.pop(); //수정된 배열 길이의 영향을 받지 않도록 뒷 index부터 가져옴
+	for (let i = 0; i < size; i++) {
+		let idx = garArr.pop(); //수정된 배열 길이의 영향을 받지 않도록 뒷 index부터 가져옴
 		numArr.splice(idx, 1); //사용한 피연산자 삭제 
 		opArr.splice(idx, 1); //사용한 연산자 삭제
 	}
-	return [numArr, opArr];
 }
 
-function calculatePlusAndMinus(numArr, opArr){
+function calculatePlusAndMinus(params){
+	let numArr = params.numberList;
+	let opArr = params.operatorList;
 	let size = opArr.length; //곱셈, 나눗셈을 제외한 연산자 배열의 길이만큼
 	let result = 0;
 	
@@ -153,5 +150,5 @@ function calculatePlusAndMinus(numArr, opArr){
 			result = operand1 - operand2;
 		numArr[i + 1] = result;
 	}
-	return numArr;
+	params.result = numArr.pop();
 }
