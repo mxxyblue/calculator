@@ -6,10 +6,10 @@ $(document).ready(function () {
 	const operBtn = document.querySelectorAll('button.operator');
 	const equal = document.querySelector('button.equal');
 	
-	for(var i=0; i<numBtn.length; i++){
+	for(let i=0; i<numBtn.length; i++){
 		numBtn[i].addEventListener('click', setCalculation); //버튼 이벤트 설정
 	}
-	for(var i=0; i<operBtn.length; i++){
+	for(let i=0; i<operBtn.length; i++){
 		operBtn[i].addEventListener('click', setCalculation);
 	}
 	equal.addEventListener('click', calculate);
