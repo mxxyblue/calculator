@@ -1,9 +1,25 @@
 /** calculator.js */
+$(document).ready(function () {
+	console.log("document ready!");
+	
+	const numBtn = document.querySelectorAll('button.number');
+	const operBtn = document.querySelectorAll('button.operator');
+	const equal = document.querySelector('button.equal');
+	
+	for(var i=0; i<numBtn.length; i++){
+		numBtn[i].addEventListener('click', setCalculation); //버튼 이벤트 설정
+	}
+	for(var i=0; i<operBtn.length; i++){
+		operBtn[i].addEventListener('click', setCalculation);
+	}
+	equal.addEventListener('click', calculate);
+});
+
 const OPERATOR = ['+', '-', '*', '/'];
 
-function setCalculation(text) {
+function setCalculation(event) {
 	let displayValue = document.querySelector('#inputNum').value;
-
+	let text = event.target.dataset.opt; //value 가져오기
 	displayValue = inputNotEmptyProcess(displayValue, text); //계산식 처리
 
 	if (text === 'C') {
@@ -26,11 +42,11 @@ function calculate() {
 }
 
 function inputNotEmptyProcess(displayValue, text) {
-	if (displayValue === "0" && text === "0") {
-		displayValue = "0"; //계산식이 0인 상태에서 0을 계속 입력할 경우
+	if (inputZeroWhenDisplayIsZero(displayValue, text)) {
+		displayValue = "0"; 
 	}
-	else if (displayValue === "0" && text != "0" && !OPERATOR.includes(text)) {
-		displayValue = text; //계산식이 0이면서 일반 숫자를 입력한 경우 0을 삭제하고 숫자를 출력
+	else if (inputNumberWhenDisplayIsZero(displayValue, text)) {
+		displayValue = text;
 	}
 	else { //계산식이 존재할 경우
 		displayValue = operatorProcess(displayValue, text); //연산자 처리
@@ -39,18 +55,53 @@ function inputNotEmptyProcess(displayValue, text) {
 	return displayValue;
 }
 
+function inputZeroWhenDisplayIsZero(displayValue, text){ //계산식이 0인 상태에서 0을 계속 입력할 경우
+	if (displayValue === "0" && text === "0") {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function inputNumberWhenDisplayIsZero(displayValue, text){ //계산식이 0이면서 일반 숫자를 입력한 경우 0을 삭제하고 숫자를 출력
+	if (displayValue === "0" && text != "0" && !OPERATOR.includes(text)){
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function operatorProcess(displayValue, text) {
 	let last = displayValue.slice(-1);
 	let preLast = displayValue.slice(-2, -1);
-
-	if (OPERATOR.includes(last) && OPERATOR.includes(text)) { //가장 마지막에 입력한 문자와 새로 입력한 문자가 연산자인지 체크
+	
+	if (lstDisplayOperAndInputValueOper(last, text)) { 
 		displayValue = displayValue.slice(0, displayValue.length - 1); //연산자를 다시 입력했을 경우 이전 연산자를 제거하고 새로운 연산자로 대체
 	}
-
-	if (last === 0 && OPERATOR.includes(preLast)) {   //마지막에 입력한 값이 숫자 0이면서 이전 값이 연산자인 경우 ex) 25 + 0
+	
+	if (lstDlsplayZeroAndInputValueOper(last, preLast)) {   
 		displayValue = displayValue.slice(0, displayValue.length - 1);
 	}
 	return displayValue;
+}
+
+function lstDisplayOperAndInputValueOper(last, text){ //가장 마지막에 입력한 문자와 새로 입력한 문자가 연산자인지 체크
+	if(OPERATOR.includes(last) && OPERATOR.includes(text)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function lstDlsplayZeroAndInputValueOper(last, preLast){ //마지막에 입력한 값이 숫자 0이면서 이전 값이 연산자인 경우 ex) 25 + 0
+	if(last === 0 && OPERATOR.includes(preLast)){
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 function inputEmptyCalculate() { //계산식이 비어있을 경우 계산
@@ -63,17 +114,18 @@ function inputNotEmptyCalculate(displayValue) { //계산식이 비어있지 않�
 	if (OPERATOR.includes(chk)){
 		displayValue = displayValue.slice(0, displayValue.length - 1); //마지막에 입력한 값이 연산자일 경우 해당 연산자를 제외하고 계산
 	}
-	const params = {
+	let params = {
 		numberList: [],
 		operatorList: [],
 		garbageList: [],
 		result: 0
 	} //연산식을 처리할 Object 선언
 	
-	splitDisplayValue(displayValue, params); //연산식 배열 처리
-	calculateMultiplyAndDivide(params); //곱하기, 나누기 연산
-	deleteUsedCalculation(params); //사용한 계산식 삭제
-	calculatePlusAndMinus(params); //더하기, 빼기 연산
+	params = splitDisplayValue(displayValue, params); //연산식 배열 처리
+	params = calculateMultiplyAndDivide(params); //곱하기, 나누기 연산
+	params = deleteUsedCalculation(params); //사용한 계산식 삭제
+	params = calculatePlusAndMinus(params); //더하기, 빼기 연산
+	
 	return params.result; //가장 마지막 값을 결과값으로 출력
 }
 
@@ -94,6 +146,7 @@ function splitDisplayValue(displayValue, params){ //계산식 배열 처리
 	if (tmp != ""){
 		params.numberList.push(Number(tmp)); //마지막 숫자 push
 	}
+	return params;
 }
 
 function calculateMultiplyAndDivide(params){
@@ -119,6 +172,7 @@ function calculateMultiplyAndDivide(params){
 			numArr[i + 1] = result; //새롭게 계산한 값은 계산한 위치에 넣어두고
 		}
 	}
+	return params;
 }
 
 function deleteUsedCalculation(params){
@@ -132,6 +186,7 @@ function deleteUsedCalculation(params){
 		numArr.splice(idx, 1); //사용한 피연산자 삭제 
 		opArr.splice(idx, 1); //사용한 연산자 삭제
 	}
+	return params;
 }
 
 function calculatePlusAndMinus(params){
@@ -151,4 +206,5 @@ function calculatePlusAndMinus(params){
 		numArr[i + 1] = result;
 	}
 	params.result = numArr.pop();
+	return params;
 }

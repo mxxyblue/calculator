@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>calculator</title>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
 <script src="/js/calculator.js" ></script>
 <style type="text/css">
 	.operator{
@@ -13,30 +14,34 @@
 		width: 100px;
 		height: 30px;
 	}
+	.equal{
+		width: 100px;
+		height: 30px;
+	}
 </style>
 </head>
 <body>
 	<input id="inputNum" name="inputNum" value="0" style="width: 300px; height: 30px;">
 	<br>
-	<button class="operator" onclick="setCalculation('+')">+</button>
-	<button class="operator" onclick="setCalculation('-')">-</button>
-	<button class="operator" onclick="setCalculation('*')">*</button>
-	<button class="operator" onclick="setCalculation('/')">/</button>
+	<button class="operator" data-opt = "+">+</button>
+	<button class="operator" data-opt = "-">-</button>
+	<button class="operator" data-opt = "*">*</button>
+	<button class="operator" data-opt = "/">/</button>
 	<br>
-	<button class="number" onclick="setCalculation('7')">7</button>
-	<button class="number" onclick="setCalculation('8')">8</button>
-	<button class="number" onclick="setCalculation('9')">9</button>
+	<button class="number" data-opt = "7">7</button>
+	<button class="number" data-opt = "8">8</button>
+	<button class="number" data-opt = "9">9</button>
 	<br>
-	<button class="number" onclick="setCalculation('4')">4</button>
-	<button class="number" onclick="setCalculation('5')">5</button>
-	<button class="number" onclick="setCalculation('6')">6</button>
+	<button class="number" data-opt = "4">4</button>
+	<button class="number" data-opt = "5">5</button>
+	<button class="number" data-opt = "6">6</button>
 	<br>
-	<button class="number" onclick="setCalculation('1')">1</button>
-	<button class="number" onclick="setCalculation('2')">2</button>
-	<button class="number" onclick="setCalculation('3')">3</button>
+	<button class="number" data-opt = "1">1</button>
+	<button class="number" data-opt = "2">2</button>
+	<button class="number" data-opt = "3">3</button>
 	<br>
-	<button class="number" onclick="setCalculation('C')">C</button>
-	<button class="number" onclick="setCalculation('0')">0</button>
-	<button class="number" onclick="calculate()">=</button>
+	<button class="number" data-opt = "C">C</button>
+	<button class="number" data-opt = "0">0</button>
+	<button class="equal">=</button>
 </body>
 </html>
